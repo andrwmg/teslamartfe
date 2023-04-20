@@ -11,6 +11,9 @@
 # production
 /build
 
+#oldfiles
+/src/old
+
 # misc
 .DS_Store
 .env
