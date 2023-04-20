@@ -85,44 +85,39 @@ function Listings() {
 
   return (
     <Container fixed sx={{ position: 'relative', opacity: loading ? 1 : 1, transition: '.4s ease-in' }}>
-      <Grid item container direction='row' justifyContent='center' gap={2} height='100%'>
-        <ListingsFilterDrawer open={open} setOpen={setOpen} handleFilter={handleFilter} />
-        <Grid container item direction='column' rowGap={4} xs={12}>
-            {/* <Grid container item direction='column' xs='auto' justifyContent='center'>
-            <Typography variant='p' fontWeight={700}>{`${currentListings.length} Matches`}</Typography>
-            </Grid> */}
-                <ListingsFilterBar chips={chips} handleDelete={handleDelete} handleOpen={handleOpen} />
+      <ListingsFilterDrawer open={open} setOpen={setOpen} handleFilter={handleFilter} />
+      <Grid container item direction='column' rowGap={4} xs={12}>
+        <ListingsFilterBar chips={chips} handleDelete={handleDelete} handleOpen={handleOpen} />
 
-          {currentListings.map((listing, index) => (
-            <Link
-              key={listing._id}
-              to={`/listings/${listing._id}`}
-              style={{ textDecoration: "none", width: "100%", }}
-            >
-              <ListingCard listing={listing} />
-            </Link>
-          ))}
+        {currentListings.map((listing, index) => (
+          <Link
+            key={listing._id}
+            to={`/listings/${listing._id}`}
+            style={{ textDecoration: "none", width: "100%", }}
+          >
+            <ListingCard listing={listing} />
+          </Link>
+        ))}
 
-          {currentListings.length < 1 ?
-            <Grid container item justifyContent='center' sx={{ opacity: loading ? 0 : 1, transition: '.4s ease-in', transitionDelay: '1s' }}>
-              <Typography fontWeight={700}>
-                Filters did not return any results.
-              </Typography>
-            </Grid>
-            :
-            null
-          }
-        </Grid>
-
-        <Fab
-          onClick={handleClick}
-          color="primary"
-          aria-label="add"
-          style={{ zIndex: 20, position: "fixed", bottom: 40, right: 40 }}
-        >
-          <Add />
-        </Fab>
+        {currentListings.length < 1 ?
+          <Grid container item justifyContent='center' sx={{ opacity: loading ? 0 : 1, transition: '.4s ease-in', transitionDelay: '1s' }}>
+            <Typography fontWeight={700}>
+              Filters did not return any results.
+            </Typography>
+          </Grid>
+          :
+          null
+        }
       </Grid>
+
+      <Fab
+        onClick={handleClick}
+        color="primary"
+        aria-label="add"
+        style={{ zIndex: 20, position: "fixed", bottom: 40, right: 40 }}
+      >
+        <Add />
+      </Fab>
     </Container>
   );
 }

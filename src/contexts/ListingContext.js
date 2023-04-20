@@ -190,19 +190,21 @@ export const ListingProvider = ({ children }) => {
         setInteriors(findInteriors())
     }
 
-    const getListings = async () => {
-        await ListingDataService.getAll()
+    const getListings = () => {
+        ListingDataService.getAll()
             .then(({ data }) => {
                 setCurrentListings(data)
                 setLoading(false)
             })
-        let result
-        window.localStorage.setItem('listings', result);
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const getListing = async (id) => {
+    const getListing = (id) => {
         setExistingImages([])
-        await ListingDataService.get(id)
+        ListingDataService.get(id)
             .then(({ data }) => {
                 setComments(data.comments)
                 setCurrentListing(data)
@@ -213,10 +215,14 @@ export const ListingProvider = ({ children }) => {
                     setIsAuthor(data.author._id === auth().id)
                 }
             })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const renderEditForm = async (id) => {
-        await ListingDataService.get(id)
+    const renderEditForm = (id) => {
+        ListingDataService.get(id)
             .then(({ data }) => {
                 setModel(data.model)
                 setYear(data.year)
@@ -233,9 +239,13 @@ export const ListingProvider = ({ children }) => {
                 setExistingImages([...data.images])
                 return data.location
             })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const createNewListing = async (images) => {
+    const createNewListing = images => {
         let result = []
         if (images.length === 0) {
             switch (model) {
@@ -278,8 +288,8 @@ export const ListingProvider = ({ children }) => {
                 default:
             }
         }
-        const data = await UploadFilesService.upload(images)
-        await ListingDataService.create({
+        const data = UploadFilesService.upload(images)
+        ListingDataService.create({
             ...current, author: auth().id,
             images: data.length ? data : result
         })
@@ -290,45 +300,66 @@ export const ListingProvider = ({ children }) => {
                     navigate(`/listings/${data.id}`)
                 }
             })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
     const seed = async () => {
         for (let seed of seedListings) {
-            await ListingDataService.create(seed)
+            ListingDataService.create(seed)
+                .then(() => {
+                    getListings()
+                })
+                .catch(({ response }) => {
+                    setMessage(response.data.message)
+                    setMessageStatus(response.data.messageStatus)
+                })
         }
-        getListings()
     }
 
     const updateListing = async (id, images) => {
         const data = await UploadFilesService.upload(images)
-        await ListingDataService.update(id, { ...current, images: data })
+        ListingDataService.update(id, { ...current, images: data })
             .then(({ data }) => {
                 setMessage(data.message)
                 setMessageStatus(data.messageStatus)
                 navigate(`/listings/${id}`)
             })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const deleteListing = async (id) => {
-        await ListingDataService.delete(id)
+    const deleteListing = (id) => {
+        ListingDataService.delete(id)
             .then(({ data }) => {
                 setMessage(data.message)
                 setMessageStatus(data.messageStatus)
                 navigate('/')
             })
-        // getListings()
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const deleteAllListings = async (id) => {
-        await ListingDataService.deleteAll()
+    const deleteAllListings = (id) => {
+        ListingDataService.deleteAll()
             .then(({ data }) => {
                 setMessage(data.message)
-                setMessageStatus(data.messageStatus)
+                setMessageStatus(data.messageStatus)        
+                getListings()
             })
-        getListings()
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const createSeedListing = async () => {
+    const createSeedListing = () => {
         const randomSelection = (arr) => {
             return arr[Math.floor(Math.random() * arr.length)]
         }
@@ -396,7 +427,7 @@ export const ListingProvider = ({ children }) => {
                 break;
             default:
         }
-        await ListingDataService.create({
+        ListingDataService.create({
             ...seed, author: auth().id, images: result
         })
             .then(({ data }) => {
@@ -409,98 +440,119 @@ export const ListingProvider = ({ children }) => {
 
     const getUser = async () => {
         const id = auth().id
-        return await userService.getUser({ id })
+        userService.getUser({ id })
+            .then(({ data }) => {
+                console.log(data)
+                return data
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
     // Can move to UserContext file
-    const register = async (obj) => {
-        const { data } = await userService.register(obj)
-        // setUser(data.user)
-        setMessage(data.message)
-        setMessageStatus(data.messageStatus)
-        if (data.messageStatus === 'success') {
-            navigate('/login')
-        }
-        // if (data.messageStatus === 'success') {
-        //     login(obj)
-        // } else {
-        //     setUser({ username: '', email: '', image: { url: '', filename: '' } })
-        // }
-    }
-
-    const verify = async (token) => {
-        const { data } = await userService.verify(token)
-        setMessage(data.message)
-        setMessageStatus(data.messageStatus)
-    }
-
-    const resend = async (obj) => {
-        const { data } = await userService.resend(obj)
-        setMessage(data.message)
-        setMessageStatus(data.messageStatus)
-        navigate('/login')
-    }
-
-    const login = async (obj) => {
-        const { data } = await userService.login(obj)
-        if (data.message === 'Account not verified') {
-            navigate('/verify')
-        } else {
-            setMessage(data.message)
-            setMessageStatus(data.messageStatus)
-            if (data.user) {
-                console.log(data.token)
-                if (signIn(
-                    {
-                        token: data.token,
-                        expiresIn: 1000 * 60 * 60 * 24 * 7,
-                        tokenType: "Bearer",
-                        authState: { email: data.user.email, username: data.user.username, id: data.user._id, image: data.user.image },
-                        // refreshToken: res.data.refreshToken,                    // Only if you are using refreshToken feature
-                        // refreshTokenExpireIn: res.data.refreshTokenExpireIn     // Only if you are using refreshToken feature
-                    }
-                )) {
-                    if (data.user.image) {
-                        setUserImage(data.user.image.url)
-                        window.localStorage.setItem('userImage', data.user.image.url)
-                    }
-                    navigate('/listings')
-                    // })
+    const register = (obj) => {
+        userService.register(obj)
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+                if (data.messageStatus === 'success') {
+                    navigate('/login')
                 }
-            }
-        }
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
-    const logout = async () => {
-        try {
-            const { data } = await userService.logout()
-            signOut();
-            setMessage(data.message)
-            setMessageStatus(data.messageStatus)
-            window.localStorage.clear()
-            navigate(0);
-        } catch (e) {
-            setMessageStatus('error')
-            setMessage(e)
-        }
+    const verify = token => {
+        userService.verify(token)
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
+    }
+
+    const resend = obj => {
+        userService.resend(obj)
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+                navigate('/login')
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
+    }
+
+    const login = obj => {
+        userService.login(obj)
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+                if (data.user) {
+                    console.log(data.token)
+                    if (signIn(
+                        {
+                            token: data.token,
+                            expiresIn: 1000 * 60 * 60 * 24 * 7,
+                            tokenType: "Bearer",
+                            authState: { email: data.user.email, username: data.user.username, id: data.user._id, image: data.user.image }
+                        }
+                    )) {
+                        if (data.user.image) {
+                            setUserImage(data.user.image.url)
+                            window.localStorage.setItem('userImage', data.user.image.url)
+                        }
+                        navigate('/listings')
+                    }
+                }
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+                if (response.data.message === 'Account not verified') {
+                    navigate('/verify')
+                }
+            })
+    }
+
+    const logout = () => {
+        userService.logout()
+            .then(({ data }) => {
+                signOut();
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+                window.localStorage.clear()
+                navigate(0);
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
     const updateUser = async (body) => {
         const id = auth().id
         userService.updateUser(id, body)
-        .then(({data}) => {
-            const obj = data.image.url
-            window.localStorage.setItem('userImage', obj)
-            // console.log(obj)
-            setUserImage(obj)
-            setMessage(data.message)
-            setMessageStatus(data.messageStatus)
-            // console.log(`Data back from updateUser: ${obj}`)
-            // console.log('Data in localhost before updating it: ', JSON.parse(window.localStorage.getItem('userImage')))
-            // console.log('Data in localhost after updating it: ', JSON.parse(window.localStorage.getItem('userImage')))
-            // console.log({...data.image})
-        })
-        // navigate(0)
+            .then(({ data }) => {
+                const obj = data.image.url
+                window.localStorage.setItem('userImage', obj)
+                setUserImage(obj)
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+            })
+            .catch(({ response }) => {
+                setMessage(response.data.message)
+                setMessageStatus(response.data.messageStatus)
+            })
     }
 
 

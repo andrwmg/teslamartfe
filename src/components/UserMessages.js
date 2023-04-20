@@ -9,12 +9,12 @@ import List from '@mui/material/List';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuthUser } from 'react-auth-kit'
 import { UserMessageList, UserConversationItem } from './index'
+import userService from '../services/user.service';
 
 const drawerWidth = 400;
 
 export default React.memo(function Messages({ window }) {
 
-    const { getUser } = useContext(ListingContext)
     const [mobileOpen, setMobileOpen] = React.useState(true);
     const [loaded, setLoaded] = useState(false)
     const [allMessages, setAllMessages] = useState([])
@@ -32,11 +32,12 @@ export default React.memo(function Messages({ window }) {
     const auth = useAuthUser()
 
     const updateAllMessages = () => {
-        getUser()
-            .then(({ data }) => {
-                setAllMessages([...data.inbox, ...data.outbox].sort((a, b) => a.createdAt.localeCompare(b.createdAt)))
-                setLoaded(true)
-            })
+        const id = auth().id
+        userService.getUser({id})
+        .then(({data})=> {
+            console.log(data)
+            setAllMessages([...data.inbox, ...data.outbox].sort((a, b) => a.createdAt.localeCompare(b.createdAt)))
+        })
     }
 
     const handleDrawerToggle = () => {
@@ -48,6 +49,7 @@ export default React.memo(function Messages({ window }) {
     }, [])
 
     useEffect(() => {
+        setLoaded(true)
         // Get all contacts out of inbox and outbox
         const fromContacts = allMessages.map(message => message.from._id)
         const toContacts = allMessages.map(message => message.to._id)
@@ -82,7 +84,8 @@ export default React.memo(function Messages({ window }) {
     }, [recipient])
 
     const populateMessages = () => {
-        getUser()
+        const {id} = auth()
+        userService.getUser({id})
             .then(({ data }) => {
                 const conversation = []
                 const allMessages = [...data.inbox, ...data.outbox].sort((a, b) => a.createdAt.localeCompare(b.createdAt))
