@@ -4,7 +4,8 @@ import http from "./http-common";
 class ListingDataService {
 
   getAll(data) {
-    return http.get("/listings", data);
+    const path = "/listings" + window.location.search
+    return http.get(path, data);
   }
 
   createOne() {
@@ -20,15 +21,15 @@ class ListingDataService {
   }
 
   create(data) {
-    return http.post("/listings", data);
+    return http.post("/listings", data)
   }
 
   update(id, data) {
     return http.put(`/listings/${id}`, data);
   }
 
-  delete(id, data) {
-    return http.delete(`/listings/${id}`, data);
+  delete(id) {
+    return http.delete(`/listings/${id}`);
   }
 
   deleteAll() {

@@ -5,20 +5,24 @@ class CommentDataService {
     return http.get("/comments");
   }
 
-  get(id) {
-    return http.get(`/comments/${id}`);
+  get(data) {
+    return http.get(`/listings/${data.id}/comments/${data.commentId}`);
   }
 
   create(data) {
-    return http.post("/comments", data);
+    return http.post(`/listings/${data.id}/comments`, data);
+  }
+
+  reply(data) {
+    return http.post(`/listings/${data.id}/comments/${data.commentId}`, data);
   }
 
   update(id, data) {
     return http.put(`/comments/${id}`, data);
   }
 
-  delete(id) {
-    return http.delete(`/comments/${id}`);
+  delete(data) {
+    return http.delete(`/listings/${data.id}/comments/${data.commentId}`, data);
   }
 
   deleteAll() {

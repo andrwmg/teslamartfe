@@ -1,43 +1,22 @@
 import React, { createContext, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { allData, defaultFilters } from "../ModelSeeds";
-import seedListings from "../seedListings";
-// import seedListings from "../seedListings";
+import { useNavigate } from "react-router-dom";
+import { allData, defaultFilters, modelS, model3, modelX, modelY } from "../seeds/ModelSeeds";
+import seedListings from "../seeds/seedListings";
 import ListingDataService from '../services/listing.service'
+import UploadFilesService from '../services/upload-files.service'
 import userService from "../services/user.service";
-import { useAuthUser } from 'react-auth-kit'
-import { useSignIn } from 'react-auth-kit'
+import { useAuthUser, useIsAuthenticated, useSignOut, useSignIn } from 'react-auth-kit'
+import cities from '../seeds/cities'
 
 export const ListingContext = createContext();
 
 export const ListingProvider = ({ children }) => {
 
-    // const allListings = seedListings
-
-    // const getListings = async () => {
-    //     const data = await ListingDataService.getAll()
-    //     console.log(data.data)
-    // }
-
-    // const createListings = async () => {
-    //     await ListingDataService.create(seedListings[0])
-    // }
-
-
-
-
-
-
-    // addSeedListings()
-
-    // console.log(currentUser)
-
     const { exteriors, autopilots, conditions, titles } = defaultFilters
 
-    const [allListings, setAllListings] = useState([])
     const [currentListings, setCurrentListings] = useState([])
-    const [currentListing, setCurrentListing] = useState('')
-    const [currentImages, setCurrentImages] = useState([])
+    const [currentListing, setCurrentListing] = useState({ images: [] })
+    const [userImage, setUserImage] = useState(null)
 
     const [models, setModels] = useState(defaultFilters.models)
     const [years, setYears] = useState(defaultFilters.years)
@@ -57,18 +36,25 @@ export const ListingProvider = ({ children }) => {
     const [price, setPrice] = useState('')
     const [description, setDescription] = useState('')
     const [author, setAuthor] = useState('')
+    const [existingImages, setExistingImages] = useState([])
+    const [allImages, setAllImages] = useState([])
+    const [comments, setComments] = useState([])
 
-    const [isLoading, setIsLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
     const [isAuthor, setIsAuthor] = useState(false)
     const [currentListingAuthor, setCurrentListingAuthor] = useState('')
     const [message, setMessage] = useState('')
+    const [messageStatus, setMessageStatus] = useState('')
 
     const navigate = useNavigate()
     const auth = useAuthUser()
+    const isAuthenticated = useIsAuthenticated()
     const signIn = useSignIn()
+    const signOut = useSignOut()
 
-    const [sort, setSort] = useState('Price: Ascending')
-    const [order, setOrder] = useState('Ascending')
+    const [sortLabel, setSortLabel] = useState('Date: Newest First')
+    const [sort, setSort] = useState('createdAt')
+    const [order, setOrder] = useState(-1)
 
     const current = {
         model: model,
@@ -82,22 +68,32 @@ export const ListingProvider = ({ children }) => {
         title: title,
         location: location,
         price: price,
-        description: description
+        description: description,
+        // images: images,
+        comments: comments
     }
 
-    const allFilters = listing => {
-        if (model !== '' && model !== listing.model) return false
-        if (year !== '' && year !== listing.year) return false
-        if (trim !== '' && trim !== listing.trim) return false
-        if (interior !== '' && interior !== listing.interior) return false
-        if (exterior !== '' && exterior !== listing.exterior) return false
-        if (autopilot !== '' && autopilot !== listing.autopilot) return false
-        return true
-    }
-
-
-    const filterListings = () => {
-        setCurrentListings(allListings.filter(allFilters))
+    const setFilters = () => {
+        const params = new URLSearchParams(window.location.search)
+        if (params.get('model')) {
+            setModel(params.get('model'))
+        } else setModel('')
+        if (params.get('year')) {
+            setYear(params.get('year'))
+        } else setYear('')
+        if (params.get('trim')) {
+            setTrim(params.get('trim'))
+        } else setTrim('')
+        if (params.get('interior')) {
+            setInterior(params.get('interior'))
+        } else setInterior('')
+        if (params.get('exterior')) {
+            setExterior(params.get('exterior'))
+        } else setExterior('')
+        if (params.get('autopilot')) {
+            setAutopilot(params.get('autopilot'))
+        } else setAutopilot('')
+        getData(params)
     }
 
     const resetFilters = () => {
@@ -113,38 +109,11 @@ export const ListingProvider = ({ children }) => {
         setLocation('')
         setPrice('')
         setDescription('')
+        setExistingImages([])
+        setAllImages([])
+        setComments('')
+        findData()
     }
-
-    const sortListings = () => {
-        if (sort === 'Price: Ascending') {
-            return currentListings.sort((a, b) => b.price - a.price)
-        } else if (sort === 'Price: Descending') {
-            return currentListings.sort((a, b) => a.price - b.price)
-        } else if (sort === 'Mileage: Ascending') {
-            return currentListings.sort((a, b) => b.mileage - a.mileage)
-        } else if (sort === 'Mileage: Descending') {
-            return currentListings.sort((a, b) => a.mileage - b.mileage)
-        // } else if (sort === 'Date: New...Old') {
-        //     return currentListings.sort((a, b) => b.createdAt - a.createdAt)
-        // } else if (sort === 'Date: Old...New') {
-        //     return currentListings.sort((a, b) => a.createdAt - b.createdAt)
-        }
-    }
-
-    let currentLocation = useLocation().pathname
-
-    // useEffect(() => {
-    //     resetFilters()
-    //     setCurrentListings(sortListings())
-    // }, [currentLocation])
-
-    // useEffect(() => {
-    //     setCurrentListings(sortListings())
-    // }, [sort, order])
-
-    // useEffect(() => {
-    //     filterListings()
-    // }, [model, year, trim, interior, exterior, autopilot])
 
     const removeDuplicates = array => {
         let result = []
@@ -158,9 +127,23 @@ export const ListingProvider = ({ children }) => {
         return result
     }
 
+    const getData = (params) => {
+        const availableModels = allData.filter(d => {
+            if (params.get('year') && !d.year.includes(Number(params.get('year')))) return false
+            if (params.get('model') && !d.model.includes(params.get('model'))) return false
+            if (params.get('trim') && !d.trim.includes(params.get('trim'))) return false
+            if (params.get('interior') && !d.interior.includes(params.get('interior'))) return false
+            return true
+        })
+        setModels(availableModels.map(a => a.model))
+        setYears(removeDuplicates(availableModels.map(a => a.year)))
+        setTrims(removeDuplicates(availableModels.map(a => a.trim)))
+        setInteriors(removeDuplicates(availableModels.map(a => a.interior)))
+    }
+
     const findModels = () => {
         return allData.filter(data => {
-            if (year !== '' && !data.year.includes(year)) return false
+            if (year !== '' && !data.year.includes(Number(year))) return false
             if (trim !== '' && !data.trim.includes(trim)) return false
             if (interior !== '' && !data.interior.includes(interior)) return false
             return true
@@ -182,7 +165,7 @@ export const ListingProvider = ({ children }) => {
     const findTrims = () => {
         return removeDuplicates(allData.filter(data => {
             if (model !== '' && !data.model.includes(model)) return false
-            if (year !== '' && !data.year.includes(year)) return false
+            if (year !== '' && !data.year.includes(Number(year))) return false
             if (interior !== '' && !data.interior.includes(interior)) return false
             return true
         }
@@ -192,109 +175,12 @@ export const ListingProvider = ({ children }) => {
     const findInteriors = () => {
         return removeDuplicates(allData.filter(data => {
             if (model !== '' && !data.model.includes(model)) return false
-            if (year !== '' && !data.year.includes(year)) return false
+            if (year !== '' && !data.year.includes(Number(year))) return false
             if (trim !== '' && !data.trim.includes(trim)) return false
             return true
         }
-        ).map(i => i.interior)
+        ).map(a => a.interior)
         )
-    }
-
-    const getAllListings = async () => {
-        await ListingDataService.getAll()
-            .then(response => {
-                setAllListings(response.data)
-                setCurrentListings(response.data)
-                setCurrentListing('')
-                console.log(response.data)
-            })
-    }
-
-    const filterAllListings = async () => {
-        await ListingDataService.getAll()
-            .then(response => {
-                setCurrentListings(response.data.filter(allFilters))
-            })
-    }
-
-    // useEffect(() => {
-    //     axios.get(`http://localhost:8080/api/listings/${id}`)
-    //         .then(({ data }) => {
-    //             setCurrentListing(data)
-    //             setCurrentListingAuthor(data.author._id)
-    //             if (auth()) {
-    //                 setCurrentUserId(auth()._id)
-    //             }
-    //         })
-    // }, [])
-
-    const getListing = async (id) => {
-        await ListingDataService.get(id)
-            .then(({ data }) => {
-                setCurrentListing(data)
-                setCurrentListingAuthor(data.author._id)
-                setAuthor(data.author._id)
-            })
-    }
-
-    const getListingAgain = async (id) => {
-        await ListingDataService.get(id)
-    }
-
-    const renderEditForm = async (id) => {
-        await ListingDataService.get(id)
-            .then(res => {
-                setModel(res.data.model)
-                setYear(res.data.year)
-                setTrim(res.data.trim)
-                setInterior(res.data.interior)
-                setExterior(res.data.exterior)
-                setAutopilot(res.data.autopilot)
-                setMileage(res.data.mileage)
-                setCondition(res.data.condition)
-                setTitle(res.data.title)
-                setLocation(res.data.location)
-                setPrice(res.data.price)
-                setDescription(res.data.description)
-            })
-    }
-
-    const createNewListing = async (data) => {
-        await ListingDataService.create(data)
-            .then((res) => {
-                if (res.data._id) {
-                    navigate(`/listings/${res.data._id}`)
-                } else {
-                    console.log(res.data)
-                }
-            })
-    }
-
-    const seed = async () => {
-        for (let seed of seedListings) {
-            await ListingDataService.create(seed)
-        }
-        getAllListings()
-    }
-
-    const updateListing = async (id) => {
-        ListingDataService.update(id, current)
-        .then(() => {
-            navigate(`/listings/${id}`)
-        })
-        // resetFilters()
-        // getListing(id)
-    }
-
-    const deleteListing = async (id) => {
-        await ListingDataService.delete(id, isAuthor)
-        console.log(isAuthor)
-        getAllListings()
-    }
-
-    const deleteAllListings = async (id) => {
-        await ListingDataService.deleteAll()
-        getAllListings()
     }
 
     const findData = () => {
@@ -303,58 +189,323 @@ export const ListingProvider = ({ children }) => {
         setTrims(findTrims())
         setInteriors(findInteriors())
     }
-    const register = async (obj) => {
-        try {
-            const res = await userService.register(obj)
-            console.log(res)
-            if (signIn(
-                {
-                    token: res.data.token,
-                    expiresIn: 1000 * 60 * 60 * 24 * 7,
-                    tokenType: "Bearer",
-                    authState: { email: res.data.email, username: res.data.username, _id: res.data._id },
+
+    const getListings = async () => {
+        await ListingDataService.getAll()
+            .then(({ data }) => {
+                setCurrentListings(data)
+                setLoading(false)
+            })
+        let result
+        window.localStorage.setItem('listings', result);
+    }
+
+    const getListing = async (id) => {
+        setExistingImages([])
+        await ListingDataService.get(id)
+            .then(({ data }) => {
+                setComments(data.comments)
+                setCurrentListing(data)
+                setCurrentListingAuthor(data.author._id)
+                setExistingImages([...data.images])
+                setAuthor(data.author._id)
+                if (isAuthenticated()) {
+                    setIsAuthor(data.author._id === auth().id)
                 }
-            )) {
-                navigate('/listings')
+            })
+    }
+
+    const renderEditForm = async (id) => {
+        await ListingDataService.get(id)
+            .then(({ data }) => {
+                setModel(data.model)
+                setYear(data.year)
+                setTrim(data.trim)
+                setInterior(data.interior)
+                setExterior(data.exterior)
+                setAutopilot(data.autopilot)
+                setMileage(data.mileage)
+                setCondition(data.condition)
+                setTitle(data.title)
+                setLocation(data.location)
+                setPrice(data.price)
+                setDescription(data.description)
+                setExistingImages([...data.images])
+                return data.location
+            })
+    }
+
+    const createNewListing = async (images) => {
+        let result = []
+        if (images.length === 0) {
+            switch (model) {
+                case ('Model S'):
+                    result.push({
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662708360/tesla/lhvqche82wz6rvl4qbvw.jpg', filename: 'tesla/vmrngf0mejwj5wefwef',
+                        id: 'modelsext'
+                    },
+                        {
+                            url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662708080/tesla/xwmwhlekhgqpzdykvoq6.jpg', filename: 'tesla/swhiteinterior'
+                        })
+                    break;
+                case ('Model 3'):
+                    result.push({
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1661937003/Tesla/0x0-Model3_01_tmcgma.jpg', filename: 'tesla/vmrngf0mejwj5dhglng',
+                        id: 'modelsex3'
+                    },
+                        {
+                            url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662837143/tesla/kd0gdftnowd0xwwqpbnd.jpg', filename: 'tesla/3ywhiteinterior'
+                        })
+                    break;
+                case ('Model X'):
+                    result.push({
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1661936886/Tesla/0x0-ModelX_02_tnd6ag.jpg', filename: 'tesla/vmrngf0mejwj5132tg2i',
+                        id: 'modelsexx'
+                    },
+                        {
+                            url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662708364/tesla/tgkfxzi0debj2q7drlrd.jpg', filename: 'tesla/xwhiteinterior'
+                        })
+                    break;
+                case ('Model Y'):
+                    result.push({
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662530428/tesla/vmrqx65np92asuxkdiew.jpg', filename: 'tesla/vmrngf0mejw8389505',
+                        id: 'modelsexy'
+                    },
+                        {
+                            url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662837143/tesla/kd0gdftnowd0xwwqpbnd.jpg', filename: 'tesla/3ywhiteinterior'
+                        })
+                    break;
+                default:
             }
-        } catch (e) {
-            alert('Incorrect username or password')
         }
+        const data = await UploadFilesService.upload(images)
+        await ListingDataService.create({
+            ...current, author: auth().id,
+            images: data.length ? data : result
+        })
+            .then(({ data }) => {
+                if (data.id) {
+                    setMessage(data.message)
+                    setMessageStatus(data.messageStatus)
+                    navigate(`/listings/${data.id}`)
+                }
+            })
+    }
+
+    const seed = async () => {
+        for (let seed of seedListings) {
+            await ListingDataService.create(seed)
+        }
+        getListings()
+    }
+
+    const updateListing = async (id, images) => {
+        const data = await UploadFilesService.upload(images)
+        await ListingDataService.update(id, { ...current, images: data })
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+                navigate(`/listings/${id}`)
+            })
+    }
+
+    const deleteListing = async (id) => {
+        await ListingDataService.delete(id)
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+                navigate('/')
+            })
+        // getListings()
+    }
+
+    const deleteAllListings = async (id) => {
+        await ListingDataService.deleteAll()
+            .then(({ data }) => {
+                setMessage(data.message)
+                setMessageStatus(data.messageStatus)
+            })
+        getListings()
+    }
+
+    const createSeedListing = async () => {
+        const randomSelection = (arr) => {
+            return arr[Math.floor(Math.random() * arr.length)]
+        }
+        const allModels = [modelS, model3, modelX, modelY]
+
+        const selectedModel = randomSelection(allModels)
+        const { year, model, trim, interior } = selectedModel
+        const { exteriors, autopilots, conditions, titles } = defaultFilters
+        const randomNumber = () => {
+            return Math.floor(Math.random() * 99999)
+        }
+        const randomCity = Math.floor(Math.random() * cities.length)
+
+        const seed = {
+            model: model,
+            year: randomSelection(year),
+            trim: randomSelection(trim),
+            exterior: randomSelection(exteriors),
+            interior: randomSelection(interior),
+            autopilot: randomSelection(autopilots),
+            mileage: randomNumber(),
+            condition: randomSelection(conditions),
+            title: randomSelection(titles),
+            price: randomNumber(),
+            location: `${cities[randomCity].city}, ${cities[randomCity].state}`,
+            comments: []
+        }
+        let result = []
+        switch (model) {
+            case ('Model S'):
+                result.push({
+                    url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662708360/tesla/lhvqche82wz6rvl4qbvw.jpg', filename: 'tesla/vmrngf0mejwj5wefwef',
+                    id: 'modelsext'
+                },
+                    {
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662708080/tesla/xwmwhlekhgqpzdykvoq6.jpg', filename: 'tesla/swhiteinterior'
+                    })
+                break;
+            case ('Model 3'):
+                result.push({
+                    url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1661937003/Tesla/0x0-Model3_01_tmcgma.jpg', filename: 'tesla/vmrngf0mejwj5dhglng',
+                    id: 'modelsex3'
+                },
+                    {
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662837143/tesla/kd0gdftnowd0xwwqpbnd.jpg', filename: 'tesla/3ywhiteinterior'
+                    })
+                break;
+            case ('Model X'):
+                result.push({
+                    url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1661936886/Tesla/0x0-ModelX_02_tnd6ag.jpg', filename: 'tesla/vmrngf0mejwj5132tg2i',
+                    id: 'modelsexx'
+                },
+                    {
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662708364/tesla/tgkfxzi0debj2q7drlrd.jpg', filename: 'tesla/xwhiteinterior'
+                    })
+                break;
+            case ('Model Y'):
+                result.push({
+                    url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662530428/tesla/vmrqx65np92asuxkdiew.jpg', filename: 'tesla/vmrngf0mejw8389505',
+                    id: 'modelsexy'
+                },
+                    {
+                        url: 'https://res.cloudinary.com/deuft4auk/image/upload/v1662837143/tesla/kd0gdftnowd0xwwqpbnd.jpg', filename: 'tesla/3ywhiteinterior'
+                    })
+                break;
+            default:
+        }
+        await ListingDataService.create({
+            ...seed, author: auth().id, images: result
+        })
+            .then(({ data }) => {
+                if (data.id) {
+                    setMessage(data.message)
+                    setMessageStatus(data.messageStatus)
+                }
+            })
+    }
+
+    const getUser = async () => {
+        const id = auth().id
+        return await userService.getUser({ id })
+    }
+
+    // Can move to UserContext file
+    const register = async (obj) => {
+        const { data } = await userService.register(obj)
+        // setUser(data.user)
+        setMessage(data.message)
+        setMessageStatus(data.messageStatus)
+        if (data.messageStatus === 'success') {
+            navigate('/login')
+        }
+        // if (data.messageStatus === 'success') {
+        //     login(obj)
+        // } else {
+        //     setUser({ username: '', email: '', image: { url: '', filename: '' } })
+        // }
+    }
+
+    const verify = async (token) => {
+        const { data } = await userService.verify(token)
+        setMessage(data.message)
+        setMessageStatus(data.messageStatus)
+    }
+
+    const resend = async (obj) => {
+        const { data } = await userService.resend(obj)
+        setMessage(data.message)
+        setMessageStatus(data.messageStatus)
+        navigate('/login')
     }
 
     const login = async (obj) => {
-        try {
-            const res = await userService.login(obj)
-            console.log(res)
-            // signIn({
-            //     token: response.data.token,
-            //     expiresIn: 1000 * 60 * 60 * 24 * 7,
-            //     authType: 'Bearer',
-            //     authState: {username: username}
-            // })
-
-            if (signIn(
-                {
-                    token: res.data.token,
-                    expiresIn: 1000 * 60 * 60 * 24 * 7,
-                    tokenType: "Bearer",
-                    authState: { email: res.data.email, username: res.data.username, _id: res.data._id },
-                    // refreshToken: res.data.refreshToken,                    // Only if you are using refreshToken feature
-                    // refreshTokenExpireIn: res.data.refreshTokenExpireIn     // Only if you are using refreshToken feature
+        const { data } = await userService.login(obj)
+        if (data.message === 'Account not verified') {
+            navigate('/verify')
+        } else {
+            setMessage(data.message)
+            setMessageStatus(data.messageStatus)
+            if (data.user) {
+                console.log(data.token)
+                if (signIn(
+                    {
+                        token: data.token,
+                        expiresIn: 1000 * 60 * 60 * 24 * 7,
+                        tokenType: "Bearer",
+                        authState: { email: data.user.email, username: data.user.username, id: data.user._id, image: data.user.image },
+                        // refreshToken: res.data.refreshToken,                    // Only if you are using refreshToken feature
+                        // refreshTokenExpireIn: res.data.refreshTokenExpireIn     // Only if you are using refreshToken feature
+                    }
+                )) {
+                    if (data.user.image) {
+                        setUserImage(data.user.image.url)
+                        window.localStorage.setItem('userImage', data.user.image.url)
+                    }
+                    navigate('/listings')
+                    // })
                 }
-            )) {
-                navigate('/listings')
             }
-        } catch (e) {
-            alert('Incorrect username or password')
         }
-        // } else {
-        //Throw error
+    }
+
+    const logout = async () => {
+        try {
+            const { data } = await userService.logout()
+            signOut();
+            setMessage(data.message)
+            setMessageStatus(data.messageStatus)
+            window.localStorage.clear()
+            navigate(0);
+        } catch (e) {
+            setMessageStatus('error')
+            setMessage(e)
+        }
+    }
+
+    const updateUser = async (body) => {
+        const id = auth().id
+        userService.updateUser(id, body)
+        .then(({data}) => {
+            const obj = data.image.url
+            window.localStorage.setItem('userImage', obj)
+            // console.log(obj)
+            setUserImage(obj)
+            setMessage(data.message)
+            setMessageStatus(data.messageStatus)
+            // console.log(`Data back from updateUser: ${obj}`)
+            // console.log('Data in localhost before updating it: ', JSON.parse(window.localStorage.getItem('userImage')))
+            // console.log('Data in localhost after updating it: ', JSON.parse(window.localStorage.getItem('userImage')))
+            // console.log({...data.image})
+        })
+        // navigate(0)
     }
 
 
     return (
-        <ListingContext.Provider value={{ currentImages, allListings, currentListings, setCurrentListings, currentListing, model, models, setModel, year, years, setYear, trim, trims, setTrim, interior, interiors, setInterior, exterior, exteriors, setExterior, autopilot, autopilots, setAutopilot, mileage, setMileage, condition, conditions, setCondition, title, titles, setTitle, location, setLocation, price, setPrice, description, setDescription, resetFilters, createNewListing, getAllListings, getListing, updateListing, deleteListing, deleteAllListings, renderEditForm, findData, filterListings, seed, isLoading, setIsLoading, getListingAgain, author, isAuthor, setIsAuthor, register,login,currentListingAuthor,current, sort, setSort, sortListings, message, setMessage}}>
+        <ListingContext.Provider value={{ userImage, setUserImage, getUser, updateUser, existingImages, setExistingImages, currentListings, setCurrentListings, currentListing, model, models, setModel, year, years, setYear, trim, trims, setTrim, interior, interiors, setInterior, exterior, exteriors, setExterior, autopilot, autopilots, setAutopilot, mileage, setMileage, condition, conditions, setCondition, title, titles, setTitle, location, setLocation, price, setPrice, description, setDescription, setFilters, resetFilters, createNewListing, getListing, updateListing, deleteListing, deleteAllListings, renderEditForm, findData, seed, loading, setLoading, author, isAuthor, setIsAuthor, register, login, logout, resend, currentListingAuthor, current, sortLabel, setSortLabel, sort, setSort, order, setOrder, message, setMessage, messageStatus, setMessageStatus, getListings, comments, setComments, allImages, setAllImages, createSeedListing, verify }}>
             {children}
         </ListingContext.Provider>
     )
