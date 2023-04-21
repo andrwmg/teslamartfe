@@ -69,7 +69,7 @@ function Navbar() {
   }
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: getBackground(), color: 'white', height: '64px', boxShadow: location.pathname === '/' && 0 }}>
+    <AppBar position="fixed" sx={{ backgroundColor: getBackground(), color: 'white', height: '64px', boxShadow: 0 }}>
       <Container maxWidth="xl" style={{ height: '100%' }} >
         <Toolbar disableGutters style={{ height: '100%' }} >
           <Typography

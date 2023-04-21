@@ -5,8 +5,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ListingContext } from "../contexts/ListingContext";
 import { useIsAuthenticated } from "react-auth-kit";
-import { ListingsFilterDrawer, ListingsFilterBar, ListingCard } from './index';
-
+import { ListingsFilterDrawer, ListingCard } from './index';
+import ListingsFilterBar from "./ListingsFilterBar copy";
 
 function Listings() {
   const {
@@ -86,7 +86,7 @@ function Listings() {
   return (
     <Container fixed sx={{ position: 'relative', opacity: loading ? 1 : 1, transition: '.4s ease-in' }}>
       <ListingsFilterDrawer open={open} setOpen={setOpen} handleFilter={handleFilter} />
-      <Grid container item direction='column' rowGap={4} xs={12}>
+      <Grid container item direction='column' rowGap={4} xs={12} mt='64px'>
         <ListingsFilterBar chips={chips} handleDelete={handleDelete} handleOpen={handleOpen} />
 
         {currentListings.map((listing, index) => (
@@ -114,7 +114,7 @@ function Listings() {
         onClick={handleClick}
         color="primary"
         aria-label="add"
-        style={{ zIndex: 20, position: "fixed", bottom: 40, right: 40 }}
+        style={{ zIndex: 2, position: "fixed", bottom: 40, right: 40 }}
       >
         <Add />
       </Fab>

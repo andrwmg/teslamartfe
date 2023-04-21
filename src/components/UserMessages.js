@@ -1,6 +1,5 @@
 import { Grid, Typography } from '@mui/material'
-import React, { useContext, useEffect, useState } from 'react'
-import { ListingContext } from '../contexts/ListingContext'
+import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';

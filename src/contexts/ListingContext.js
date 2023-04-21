@@ -350,7 +350,7 @@ export const ListingProvider = ({ children }) => {
         ListingDataService.deleteAll()
             .then(({ data }) => {
                 setMessage(data.message)
-                setMessageStatus(data.messageStatus)        
+                setMessageStatus(data.messageStatus)
                 getListings()
             })
             .catch(({ response }) => {
@@ -498,7 +498,6 @@ export const ListingProvider = ({ children }) => {
                 setMessage(data.message)
                 setMessageStatus(data.messageStatus)
                 if (data.user) {
-                    console.log(data.token)
                     if (signIn(
                         {
                             token: data.token,
@@ -528,10 +527,9 @@ export const ListingProvider = ({ children }) => {
         userService.logout()
             .then(({ data }) => {
                 signOut();
+                window.localStorage.clear()
                 setMessage(data.message)
                 setMessageStatus(data.messageStatus)
-                window.localStorage.clear()
-                navigate(0);
             })
             .catch(({ response }) => {
                 setMessage(response.data.message)
