@@ -66,36 +66,41 @@ export default function RegistrationForm() {
       <CardContent>
 
         <form onSubmit={handleSubmit}>
-          <Grid container item rowGap={4}>
+          <Grid container item rowGap={4} justifyContent='start'>
             <Typography variant="h4" color="text.secondary">
               Register
             </Typography>
-            <Grid container item xs={12} justifyContent='center'>
-              <label htmlFor="images">
-                <div className="form-group">
-                  <input
-                    id="images"
-                    name="images"
-                    style={{ display: 'none' }}
-                    type="file"
-                    accept="image/*"
-                    onChange={selectFile}
-                  />
-                </div>
-                <div className="form-group">
-                  <Button
-                    className="btn-choose"
-                    variant="outlined"
-                    component="div"
-                    sx={{ borderRadius: '50%', p: 0 }}>
-                    <Avatar alt='' src={userImage[0].tempUrl} style={{ height: '100px', width: '100px', objectFit: 'cover', p: 'none', borderRadius: '50%' }} />
-                  </Button>
-                </div>
+            <Grid container item justifyContent='start'>
+              <Grid container item direction='column' xs='auto' alignItems='center' gap={2}>
+                <Grid container item justifyContent='center'>
+                  <label htmlFor="images">
+                    <div className="form-group">
+                      <input
+                        id="images"
+                        name="images"
+                        style={{ display: 'none' }}
+                        type="file"
+                        accept="image/*"
+                        onChange={selectFile}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <Button
+                        className="btn-choose"
+                        variant="outlined"
+                        component="div"
+                        sx={{ borderRadius: '50%', p: 0 }}>
+                        <Avatar alt='' src={userImage[0].tempUrl} style={{ height: '100px', width: '100px', objectFit: 'cover', p: 'none', borderRadius: '50%' }} />
+                      </Button>
+                    </div>
 
-              </label>
+                  </label>
+                </Grid>
+                <Typography variant='body1' textAlign='center'>Upload profile picture</Typography>
+              </Grid>
             </Grid>
             <TextField
-               
+
               id="outlined-email-input"
               label="Email"
               type="email"
@@ -136,7 +141,7 @@ export default function RegistrationForm() {
                       onMouseDown={handleMouseDownPassword}
                       edge="end"
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
               }}

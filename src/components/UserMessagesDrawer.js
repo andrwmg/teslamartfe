@@ -1,57 +1,54 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import Button from '@mui/material/Button';
-import { ArrowBack } from '@mui/icons-material';
-import { Grid } from '@mui/material';
-import { UserMessage } from './index'
+import { SwipeableDrawer } from '@mui/material';
 
+const drawerWidth = 400;
 
-export default function MessagesDrawer({ conversationList, changeRecipient }) {
-  const [open, setOpen] = React.useState(false);
+export default function MessagesDrawer({ list, mobileOpen, handleDrawerToggle }) {
 
-  const toggleDrawer = () => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-
-    setOpen(!open);
-  };
-
-  const list = () => (
-    <Box
-      containerStyle={{ height: 'calc(100% - 64px)', top: 64 }}
-      sx={{ width: '100vw', height: 'calc(100vh - 64px)', marginTop: '64px' }}
-      role="presentation"
-      onClick={toggleDrawer()}
-      onKeyDown={toggleDrawer()}
-      display={{ xs: 'inline-block', sm: 'none' }}
-    >
-      <Grid item container rowGap={2}>
-        {conversationList.map(convo => (
-          <UserMessage key={convo._id} setMessages={conversationList} changeRecipient={changeRecipient} message={convo} conversationListItem={true} />
-        ))}
-      </Grid>
-    </Box>
-  );
+  const container = window !== undefined ? () => window.document.body : undefined;
 
   return (
-    <div style={{ display: { xs: 'inline-block', sm: 'none' } }}>
-      <React.Fragment key='leftDrawer'>
-        <Button onClick={toggleDrawer()}>
-          <ArrowBack />
-        </Button>
-        <Drawer
-          containerstyle={{ height: 'calc(100% - 64px)', top: 64 }}
-          anchor='left'
-          open={open}
-          onClose={toggleDrawer()}
-          height='calc(100vh - 64px)'
-          hideBackdrop={true}
-        >
-          {list()}
-        </Drawer>
-      </React.Fragment>
-    </div>
+    <Box
+                    component="nav"
+                    sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 }, zIndex: 1, height: 'calc(100vh - 128px)' }}
+                    aria-label="mailbox folders"
+                >
+                    {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+
+                    <SwipeableDrawer
+                        container={container}
+                        variant="temporary"
+                        open={mobileOpen}
+                        onOpen={handleDrawerToggle}
+                        onClose={handleDrawerToggle}
+                        ModalProps={{
+                            keepMounted: true, // Better open performance on mobile.
+                        }}
+                        sx={{
+                            transition: '.3s ease-in-out',
+                            display: { xs: 'block', md: 'none', top: '64px' },
+                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: '100vw', justifyContent: 'flex-end', height: 'calc(100vh - 64px)', top: '64px', backgroundColor: 'none', transition: '.3s ease-in-out', zIndex: 1 },
+                            '& .MuiBackdrop-root': { top: '64px', height: 'calc(100vh - 64px)' },
+                            '& .MuiModal-root': { marginTop: '64px' }
+
+                        }}
+                    >
+                        {list}
+                    </SwipeableDrawer>
+                    <Drawer
+                        variant="permanent"
+                        sx={{
+                            display: { xs: 'none', md: 'block', top: '64px' },
+                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, justifyContent: 'flex-end', height: 'calc(100vh - 64px)', top: '64px', backgroundColor: 'none', transition: '.3s ease-in-out', zIndex: 1 },
+                            '& .MuiBackdrop-root': { top: '64px', height: 'calc(100vh - 64px)' },
+                            '& .MuiModal-root': { marginTop: '64px' },
+                        }}
+                        open
+                    >
+                        {list}
+                    </Drawer>
+                </Box>
   );
 }

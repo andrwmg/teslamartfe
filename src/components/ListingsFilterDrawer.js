@@ -1,4 +1,4 @@
-import { Button, Drawer, Grid, IconButton, Toolbar, Typography } from "@mui/material";
+import { Button, Grid, IconButton, SwipeableDrawer, Toolbar, Typography } from "@mui/material";
 import React, { useContext, useEffect } from "react";
 import { ListingContext } from "../contexts/ListingContext";
 import { useAuthUser, useIsAuthenticated } from 'react-auth-kit'
@@ -21,7 +21,7 @@ export default React.memo(function FilterDrawer({ open, handleFilter, setOpen })
     const isAuthenticated = useIsAuthenticated()
 
     const drawer = (
-        <Grid container item direction='column' rowGap={4} pt={2} px={4}>
+        <Grid container item direction='column' rowGap={4} px={4}>
             <Toolbar />
             <Grid container item justifyContent='space-between' alignItems='center'>
                 <Typography variant='h5'>Filters</Typography>
@@ -45,10 +45,11 @@ export default React.memo(function FilterDrawer({ open, handleFilter, setOpen })
     );
 
     return (
-        <Drawer
+        <SwipeableDrawer
             variant="temporary"
             open={open}
             onClose={() => setOpen(!open)}
+            onOpen={() => setOpen(!open)}
             ModalProps={{
                 keepMounted: true, // Better open performance on mobile.
             }}
@@ -59,6 +60,6 @@ export default React.memo(function FilterDrawer({ open, handleFilter, setOpen })
             }}
         >
             {drawer}
-        </Drawer>
+        </SwipeableDrawer>
     );
 })

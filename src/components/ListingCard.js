@@ -18,7 +18,7 @@ export default function ListingCard({ listing }) {
         width: "100%",
         transform: focus ? "scale(1.025)" : "scale(1.0)",
         transition: ".4s ease-in-out",
-        maxHeight: {lg: '330px'}
+        maxHeight: {lg: '330px'},
       }}
     >
       <CardActionArea>
@@ -48,7 +48,7 @@ export default function ListingCard({ listing }) {
               alt="Listing Image"
             />
           </Grid>
-          <Grid item xs={12} lg={5} p={4} zIndex={2} bgcolor="white">
+          <Grid item xs={12} lg={5} p={4} px={{xs: 2, md: 4}} zIndex={2}>
             <ListingCardInfo {...listing} />
           </Grid>
         </Grid>

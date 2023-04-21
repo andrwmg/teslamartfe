@@ -22,9 +22,9 @@ export default React.memo(function ListingModForm() {
 
     return (
         <Container>
-            <Grid container rowGap={2} direction='row' justifyContent='center'>
+            <Grid container rowGap={4} direction='row' justifyContent='center'>
                 <Grid item xs={12} sm={11}>
-                    <Typography variant='h4' color='black'>{id ? 'Edit Listing' : 'New Listing'}</Typography>
+                    <Typography variant='h3' color='text.primary'>{id ? 'Edit Listing' : 'New Listing'}</Typography>
                 </Grid>
                 <ListingForm />
             </Grid>

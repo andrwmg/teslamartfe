@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { Button, CardMedia, Grid, IconButton, InputAdornment, Paper, TextField } from '@mui/material';
+import { Button, CardMedia, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
 import { ListingContext } from '../contexts/ListingContext';
+import { useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default React.memo(function VerifyCard() {
@@ -12,6 +13,7 @@ export default React.memo(function VerifyCard() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const navigate = useNavigate()
 
     useEffect(()=>{
         setLoading(false)
@@ -48,7 +50,8 @@ export default React.memo(function VerifyCard() {
                 alt="Tesla Mart Registration"
             />
             <CardContent>
-                <Paper elevation={0} component='form' onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
+
                     <Grid container item direction='column' rowGap={4} justifyContent='center'>
                     
                         <Typography variant="h6" color="text.secondary" textAlign='center'>
@@ -90,9 +93,10 @@ export default React.memo(function VerifyCard() {
                                     </InputAdornment>
                             }}
                         />
-                        <Button onClick={handleSubmit}>Resend</Button>
+                        <Button type='submit' variant='contained'>Resend</Button>
+                        <Button onClick={() => navigate('/login')} variant='text' sx={{ width: '100%', mx: 'auto' }}>Back to log in</Button>
                     </Grid>
-                </Paper>
+                    </form>
             </CardContent>
         </Card>
     );

@@ -9,10 +9,10 @@ export default function ShowCardInfo({ year, model, trim, mileage, price, locati
             overflow={{ xs: 'visible', md: 'scroll' }}
             maxHeight='calc(665.5px - 97px)' wrap='nowrap'>
             <Grid container item direction='row' xs={12} pb={3} alignItems='flex-start'>
-                <Typography noWrap component="span" variant="h5" color='primary.main' marginRight={1} maxHeight='32.5px' my={0}>
+                <Typography noWrap variant="h4" color='primary.main' marginRight={1} maxHeight='32.5px' my={0}>
                     {year} {model}
                 </Typography>
-                <Typography noWrap component="span" variant="h5" color='primary.main' maxHeight='32.5px'>
+                <Typography noWrap variant="h4" color='primary.main' maxHeight='32.5px'>
                     {trim}
                 </Typography>
                 <Grid container item xs={12}>

@@ -84,9 +84,9 @@ function Listings() {
   }
 
   return (
-    <Container fixed sx={{ position: 'relative', opacity: loading ? 1 : 1, transition: '.4s ease-in' }}>
+    <Container fixed sx={{ position: 'relative', opacity: loading ? 1 : 1 }}>
       <ListingsFilterDrawer open={open} setOpen={setOpen} handleFilter={handleFilter} />
-      <Grid container item direction='column' rowGap={4} xs={12} mt='64px'>
+      <Grid container item direction='column' rowGap={4} xs={12} mt='80px'>
         <ListingsFilterBar chips={chips} handleDelete={handleDelete} handleOpen={handleOpen} />
 
         {currentListings.map((listing, index) => (
@@ -100,7 +100,7 @@ function Listings() {
         ))}
 
         {currentListings.length < 1 ?
-          <Grid container item justifyContent='center' sx={{ opacity: loading ? 0 : 1, transition: '.4s ease-in', transitionDelay: '1s' }}>
+          <Grid container item justifyContent='center' sx={{ opacity: loading ? 0 : 1 }}>
             <Typography fontWeight={700}>
               Filters did not return any results.
             </Typography>

@@ -1,14 +1,13 @@
 import { Grid, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuthUser } from 'react-auth-kit'
 import { UserMessageList, UserConversationItem } from './index'
 import userService from '../services/user.service';
+import MessagesDrawer from './UserMessagesDrawer';
 
 const drawerWidth = 400;
 
@@ -26,7 +25,6 @@ export default React.memo(function Messages({ window }) {
             _id: ''
         }])
     const [recipient, setRecipient] = useState('')
-    const container = window !== undefined ? () => window().document.body : undefined;
 
     const auth = useAuthUser()
 
@@ -98,9 +96,8 @@ export default React.memo(function Messages({ window }) {
             })
     }
 
-    const drawer = (
+    const list = (
         <div style={{ height: 'calc(100vh - 64px)', backgroundColor: 'none', zIndex: 1 }}>
-            <Divider />
             <List>
                 {conversationList && conversationList.map((message, index) => (
                     <UserConversationItem key={message._id} message={message} changeRecipient={changeRecipient} />
@@ -114,44 +111,7 @@ export default React.memo(function Messages({ window }) {
             {allMessages.length === 0 ?
                 null
                 :
-                <Box
-                    component="nav"
-                    sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 }, zIndex: 1, height: 'calc(100vh - 128px)' }}
-                    aria-label="mailbox folders"
-                >
-                    {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-
-                    <Drawer
-                        container={container}
-                        variant="temporary"
-                        open={mobileOpen}
-                        onClose={handleDrawerToggle}
-                        ModalProps={{
-                            keepMounted: true, // Better open performance on mobile.
-                        }}
-                        sx={{
-                            display: { xs: 'block', md: 'none', top: '64px' },
-                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: '100vw', justifyContent: 'flex-end', height: 'calc(100vh - 64px)', top: '64px', backgroundColor: 'none', zIndex: 1 },
-                            '& .MuiBackdrop-root': { top: '64px', height: 'calc(100vh - 64px)' },
-                            '& .MuiModal-root': { marginTop: '64px' }
-
-                        }}
-                    >
-                        {drawer}
-                    </Drawer>
-                    <Drawer
-                        variant="permanent"
-                        sx={{
-                            display: { xs: 'none', md: 'block', top: '64px' },
-                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, justifyContent: 'flex-end', height: 'calc(100vh - 64px)', top: '64px', backgroundColor: 'none', zIndex: 1 },
-                            '& .MuiBackdrop-root': { top: '64px', height: 'calc(100vh - 64px)' },
-                            '& .MuiModal-root': { marginTop: '64px' }
-                        }}
-                        open
-                    >
-                        {drawer}
-                    </Drawer>
-                </Box>
+                <MessagesDrawer list={list} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
             }
             <Box
                 component="main"
@@ -173,8 +133,8 @@ export default React.memo(function Messages({ window }) {
                                         <IconButton onClick={() => setMobileOpen(true)} sx={{ justifySelf: 'flex-start', display: { xs: 'inline-block', md: 'none' } }}>
                                             <MenuIcon />
                                         </IconButton>
-                                        <Typography variant='span' mx='auto'>
-                                            <b>{recipient.username}</b></Typography>
+                                        <Typography variant='body1' color='primary' mx='auto'>
+                                            {recipient.username}</Typography>
                                     </Grid>
 
                                     <UserMessageList messages={messages} setAllMessages={setAllMessages} recipient={recipient} populateMessages={populateMessages} changeRecipient={changeRecipient} />

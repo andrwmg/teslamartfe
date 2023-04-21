@@ -7,10 +7,10 @@ export default function ListingCardInfo({ year, model, trim, mileage, price, loc
         <Grid container direction='row' gap={2} alignItems='start' justifyContent='start'>
             <Grid container item direction='column' xs={12}>
                 <Grid container item>
-                <Typography noWrap component="span" variant="h5" color='primary.main' marginRight={1} width='auto'>
+                <Typography noWrap variant='h4' color='primary.main' marginRight={1} width='auto'>
                     {year} {model}
                 </Typography>
-                <Typography noWrap component="span" variant="h5" color='primary.main' width='auto'>
+                <Typography noWrap variant='h4' color='primary.main' width='auto'>
                     {trim}
                 </Typography>
                 </Grid>
@@ -33,7 +33,7 @@ export default function ListingCardInfo({ year, model, trim, mileage, price, loc
                             Price
                         </Typography>
 
-                        <Typography variant="h6" color="text.primary" component="div">
+                        <Typography variant="body1" color="text.primary" component="div">
                             ${price.toLocaleString()}
                         </Typography>
                     </Grid>
@@ -43,21 +43,21 @@ export default function ListingCardInfo({ year, model, trim, mileage, price, loc
                         <Typography variant="subtitle2" color="text.secondary" component="div">
                             Mileage
                         </Typography>
-                        <Typography variant="h6" color="text.primary" component="div">
+                        <Typography variant="body1" color="text.primary" component="div">
                             {mileage.toLocaleString()} miles
                         </Typography>
                     </Grid>
                 </Grid>
 
             </Grid>
-            <Grid container item direction='column' xs={12} md='auto' gap={3}>
+            <Grid container item direction='column' xs={12} md='auto' lg={12} gap={3}>
                 <Grid container item height='auto' direction='column' xs={12} md gap={3}>
                     <Grid container item justifyContent='start' gap={3}>
                         <Grid container item direction='column' xs='auto'>
                             <Typography variant="subtitle2" color="text.secondary" component="div">
                                 Exterior
                             </Typography>
-                            <Typography variant="h6" color="text.primary" component="div">
+                            <Typography variant="body1" color="text.primary" component="div">
                                 {exterior}
                             </Typography>
                         </Grid>
@@ -65,7 +65,7 @@ export default function ListingCardInfo({ year, model, trim, mileage, price, loc
                             <Typography variant="subtitle2" color="text.secondary" component="div">
                                 Interior
                             </Typography>
-                            <Typography variant="h6" color="text.primary" component="div">
+                            <Typography variant="body1" color="text.primary" component="div">
                                 {interior}
                             </Typography>
                         </Grid>
@@ -73,7 +73,7 @@ export default function ListingCardInfo({ year, model, trim, mileage, price, loc
                             <Typography variant="subtitle2" color="text.secondary" component="div">
                                 Autopilot
                             </Typography>
-                            <Typography variant="h6" color="text.primary" component="div">
+                            <Typography variant="body1" color="text.primary" component="div">
                                 {autopilot}
                             </Typography>
                         </Grid>

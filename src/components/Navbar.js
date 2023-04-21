@@ -11,11 +11,12 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { grey } from '@mui/material/colors';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthUser, useIsAuthenticated } from 'react-auth-kit'
 import { ListingContext } from '../contexts/ListingContext';
 import { DefaultAvatar } from './index';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { DarkMode, LightMode } from '@mui/icons-material';
 
 
 const pages = ['Listings'];
@@ -23,7 +24,8 @@ const pages = ['Listings'];
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const {userImage, setUserImage, logout} = React.useContext(ListingContext)
+  const { userImage, setUserImage, logout } = React.useContext(ListingContext)
+  const { theme, toggleTheme } = React.useContext(ThemeContext)
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -36,7 +38,7 @@ function Navbar() {
   const location = useLocation()
   const isAuthenticated = useIsAuthenticated()
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     const profile = window.localStorage.getItem('userImage')
     if (profile) {
       setUserImage(profile)
@@ -52,13 +54,13 @@ function Navbar() {
     setAnchorElNav(null);
   };
 
-  const getBackground = () => {
-    if (location.pathname === '/') {
-      return 'transparent'
-    } else {
-      return grey[900]
-    }
-  }
+  // const getBackground = () => {
+  //   if (location.pathname === '/') {
+  //     return 'transparent'
+  //   } else {
+  //     return grey[900]
+  //   }
+  // }
 
   const handleMessages = () => {
     navigate('/messages')
@@ -69,7 +71,7 @@ function Navbar() {
   }
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: getBackground(), color: 'white', height: '64px', boxShadow: 0 }}>
+    <AppBar position="fixed" sx={{ backgroundColor: location.pathname === '/' ? 'transparent' : 'appbar.main', color: 'white', height: '64px', boxShadow: 0, transition: 'all .3s ease-in-out' }}>
       <Container maxWidth="xl" style={{ height: '100%' }} >
         <Toolbar disableGutters style={{ height: '100%' }} >
           <Typography
@@ -151,7 +153,7 @@ function Navbar() {
             </Button>
           </Box>
 
-          <Box sx={{ flexGrow: 0, marginLeft: 1 }}>
+          <Box sx={{ flexGrow: 0, marginLeft: 2 }}>
             {!isAuthenticated() ?
               <Button
                 key='loginButton'
@@ -211,17 +213,21 @@ function Navbar() {
                   transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                  {/* {settings.map((setting) => ( */}
                   <MenuItem key='Messages' onClick={handleMessages}>
                     <Typography textAlign="center">Messages</Typography>
                   </MenuItem>
                   <MenuItem key='Profile' onClick={handleProfile}>
                     <Typography textAlign="center">Profile</Typography>
                   </MenuItem>
+                  <MenuItem key='Mode' onClick={toggleTheme}>
+                    <Typography textAlign='center' mr={2}>Theme</Typography>
+                    {theme === 'light' ?
+                      <LightMode /> : <DarkMode />
+                    }
+                  </MenuItem>
                   <MenuItem key='Log Out' onClick={logout}>
                     <Typography textAlign="center">Log Out</Typography>
                   </MenuItem>
-                  {/* ))} */}
                 </Menu>
               </>
             }

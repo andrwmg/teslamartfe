@@ -63,11 +63,14 @@ export default function UserProfileForm() {
   return (
     <Card sx={{ width: '100%', mx: 'auto' }}>
       <CardContent>
+      <form onSubmit={handleSubmit}>
           <Grid container item rowGap={4}>
             <Typography variant="h4" color="text.secondary">
               Profile
             </Typography>
-            <Grid container item direction='column' xs={12} justifyContent='left' width='150px' height='150px' position='relative'>
+            <Grid container item justifyContent='start'>
+            <Grid container item direction='column' gap={2} alignItems='center' width='auto'>
+            <Grid container item width='150px' height='150px' position='relative'>
               <label htmlFor="images">
                 <div className="form-group">
                   <input
@@ -95,8 +98,10 @@ export default function UserProfileForm() {
                     }
                   </Button>
                 </div>
-
               </label>
+            </Grid>
+            <Typography variant='body1' fontWeight={700}>Change profile picture</Typography>
+            </Grid>
             </Grid>
             <TextField
                
@@ -136,10 +141,12 @@ export default function UserProfileForm() {
               required
             />
 
-            <Button type='submit' disabled={!tempImage} onClick={handleSubmit} variant='contained' sx={{ width: '100%', mx: 'auto' }}>
+            <Button type='submit' disabled={!tempImage} variant='contained' sx={{ width: '100%', mx: 'auto' }}>
               Save
             </Button>
           </Grid>
+          </form>
+
       </CardContent>
     </Card>
   );

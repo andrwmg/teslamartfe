@@ -18,7 +18,6 @@ export default function DeleteConfirmation(props) {
     }
 
     return (
-        <div>
             <Dialog open={open} onClose={handleClose} aria-labelledby='delete-dialog-title'>
                 <DialogTitle id='delete-dialog-title'>Delete listing?</DialogTitle>
                 <List>
@@ -44,6 +43,5 @@ export default function DeleteConfirmation(props) {
                     </ListItem>
                 </List>
             </Dialog>
-        </div>
     );
 }

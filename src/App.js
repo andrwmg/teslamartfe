@@ -7,13 +7,15 @@ import listingService from './services/listing.service';
 import userService from './services/user.service';
 import ScrollToTop from './ScrollToTop'
 import { Home, Page, Listings, UserMessages, ListingModForm, UserProfileForm, UserVerifyCard, UserWrapper, Show, UserLoginForm, UserResetForm, UserForgotForm, UserRegistrationForm } from './components/index'
+import { ThemeContext } from './contexts/ThemeContext';
 
 function App() {
   const isAuthenticated = useIsAuthenticated()
   const auth = useAuthUser()
   const navigate = useNavigate()
 
-  const {setMessage, setMessageStatus} = useContext(ListingContext)
+  const { setMessage, setMessageStatus } = useContext(ListingContext)
+  const { theme } = useContext(ThemeContext)
 
   // const EditRedirect = () => {
   //   const { id } = useParams();
@@ -63,51 +65,51 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <Page>
-        <ScrollToTop />
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/profile/:id'
-            element={
+    <div className="App" style={{backgroundColor: theme === 'dark' && '#121212'}}>
+        <Page>
+          <ScrollToTop />
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/profile/:id'
+              element={
+                <RequireAuth loginPath={'/login'}>
+                  <UserWrapper form={<UserProfileForm />} />
+                </RequireAuth>
+              } />
+            <Route path='/messages' element={
               <RequireAuth loginPath={'/login'}>
-                <UserWrapper form={<UserProfileForm />} />
+                <UserMessages />
               </RequireAuth>
             } />
-          <Route path='/messages' element={
-                        <RequireAuth loginPath={'/login'}>
-                        <UserMessages />
-                        </RequireAuth>
-} />
-          <Route path='/listings/new'
-            element={
-              <RequireAuth loginPath={'/login'}>
-                <ListingModForm />
-              </RequireAuth>
+            <Route path='/listings/new'
+              element={
+                <RequireAuth loginPath={'/login'}>
+                  <ListingModForm />
+                </RequireAuth>
+              } />
+            <Route path='/listings' element={<Listings />} />
+            <Route path='/listings/:id/edit'
+              element={isAuthenticated() ?
+                <RequireAuth loginPath={'/login'}>
+                  <ListingModForm />
+                </RequireAuth>
+                :
+                <EditRedirect />
+              } />
+            <Route path='/listings/:id' element={<Show />} />
+            <Route path='/login' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserLoginForm />} />} />
+            <Route path='/verify' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserVerifyCard />} />
             } />
-          <Route path='/listings' element={<Listings />} />
-          <Route path='/listings/:id/edit'
-            element={isAuthenticated() ?
-              <RequireAuth loginPath={'/login'}>
-                <ListingModForm />
-              </RequireAuth>
-              :
-              <EditRedirect />
+            <Route path='/verify/:token' element={isAuthenticated() ? <ListingsRedirect /> : <VerifyLink />
             } />
-          <Route path='/listings/:id' element={<Show />} />
-          <Route path='/login' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserLoginForm />} /> } />
-          <Route path='/verify' element={ isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserVerifyCard />} />
-          } />
-          <Route path='/verify/:token' element={ isAuthenticated() ? <ListingsRedirect /> :<VerifyLink />
-          } />
-          <Route path='/register' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserRegistrationForm />} /> } />
-          <Route path='/forgot' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserForgotForm />} /> } />
-          <Route path='/reset' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserResetForm />} /> } />
+            <Route path='/register' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserRegistrationForm />} />} />
+            <Route path='/forgot' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserForgotForm />} />} />
+            <Route path='/reset' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<UserResetForm />} />} />
 
-          <Route path='/reset/:token' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<ResetLink />} /> } />
-          <Route path='/*' element={<ListingsRedirect /> } />
-        </Routes>
-      </Page>
+            <Route path='/reset/:token' element={isAuthenticated() ? <ListingsRedirect /> : <UserWrapper form={<ResetLink />} />} />
+            <Route path='/*' element={<ListingsRedirect />} />
+          </Routes>
+        </Page>
     </div>
   );
 }

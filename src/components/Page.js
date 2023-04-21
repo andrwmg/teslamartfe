@@ -18,7 +18,7 @@ function Page(props) {
         <Box sx={{ display: 'flex'}}>
                 <Navbar user={user} />
             <Box component="main" sx={{
-                width: '100%', p: 0, height: '100%'
+                width: '100%', p: 0, height: 'calc(100vh - 64px)'
             }}>
                 {location.pathname !== '/' &&
                     <Toolbar style={{ height: '64px' }} />
@@ -26,7 +26,7 @@ function Page(props) {
                 {isLoading && <LoadingOverlay />}
                 {message && <MessageSnackbar />}
                 <Grid container item 
-                marginTop={location.pathname !== '/' && 2} marginBottom={location.pathname !== '/' && 6} minHeight='calc(100vh - 128px)'>
+                pt={(location.pathname !== '/' && location.pathname !== '/listings') && 4} pb={location.pathname !== '/' && 6} minHeight='calc(100vh - 64px)'>
                     {props.children}
                 </Grid>
             </Box>

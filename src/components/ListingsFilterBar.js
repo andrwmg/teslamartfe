@@ -21,7 +21,8 @@ export default function FilterBar({ chips, handleDelete, handleOpen }) {
                 ))}
             </Grid>
             {(auth() && auth().username === 'nellie') && <Button onClick={createSeedListing}>Seed Listing</Button>}
-            <IconButton onClick={handleOpen}>
+            <IconButton onClick={handleOpen} color="icon.default"
+>
                 <FilterList />
             </IconButton>
         </Grid>

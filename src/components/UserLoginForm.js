@@ -3,7 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { CardMedia, Grid, IconButton, Paper, TextField } from '@mui/material';
+import { CardMedia, Grid, IconButton, TextField } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ListingContext } from '../contexts/ListingContext';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -59,7 +59,7 @@ export default function LoginForm() {
                 alt="Tesla Mart Registration"
             />
             <CardContent>
-                <Paper elevation={0} component='form' onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
                     <Grid container item direction='column' rowGap={4}>
                         <Typography variant="h4" color="text.secondary">
                             Log In
@@ -95,7 +95,7 @@ export default function LoginForm() {
                                             onMouseDown={handleMouseDownPassword}
                                             edge="end"
                                         >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            {showPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
                             }}
@@ -116,7 +116,7 @@ export default function LoginForm() {
                         </Grid>
                         <Button onClick={() => navigate('/forgot')} variant='text' sx={{ width: '100%', mx: 'auto' }}>Forgot password?</Button>
                     </Grid>
-                </Paper>
+                    </form>
             </CardContent>
         </Card>
     );
