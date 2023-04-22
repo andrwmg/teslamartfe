@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, IconButton } from "@mui/material";
+import { AppBar, Box, Button, IconButton, Grid } from "@mui/material";
 import React, { useContext } from "react";
 import { ListingContext } from "../contexts/ListingContext";
 import { useAuthUser } from 'react-auth-kit'
@@ -19,10 +19,11 @@ export default function FilterBar({ chips, handleDelete, handleOpen }) {
             <AppBar position="static" sx={{ bgcolor: theme === 'dark' ?  'rgba(0,0,0,.85)' : 'rgba(255,255,255,.85)', height: '100%', boxShadow: 'none', justifyContent: 'center', transition: '.3s ease-in-out' }}>
                 <Container fixed sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', gap: 2 }}>
                     <Box sx={{ flexGrow: 1 }} />
-
+                        <Grid container item overflow='scroll' wrap='nowrap' gap={2} px={1}>
                     {chips && chips.map(chip => (
                         <ListingsFilterChip key={chip.key} filterKey={chip.key} filterValue={chip.value} handleDelete={handleDelete} />
                     ))}
+                    </Grid>
                     {(auth() && auth().username === 'nellie') && <Button onClick={createSeedListing}>Seed Listing</Button>}
                     <IconButton
                         onClick={handleOpen}

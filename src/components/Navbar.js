@@ -83,6 +83,7 @@ function Navbar() {
               mr: 2,
               display: { xs: 'flex' },
               fontWeight: 500,
+              fontFamily: 'Poppins',
               color: 'inherit',
               textDecoration: 'none',
             }}

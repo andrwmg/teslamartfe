@@ -12,22 +12,26 @@ export const CustomThemeProvider = ({ children }) => {
     useEffect(() => {
         if (getHours(new Date()) > 6 && getHours(new Date()) < 19) {
             setTheme('light')
+            window.localStorage.setItem('theme', 'light')
         } else {
             setTheme('dark')
+            window.localStorage.setItem('theme', 'dark')
         }
     }, [])
 
     const toggleTheme = () => {
         if (theme === 'light') {
             setTheme('dark')
+            window.localStorage.setItem('theme', 'dark')
         } else if (theme === 'dark') {
             setTheme('light')
+            window.localStorage.setItem('theme', 'light')
         }
     }
 
     return (
         <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-            <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+            <ThemeProvider theme={window.localStorage.getItem('theme') === 'light' ? lightTheme : darkTheme}>
                 {children}
             </ThemeProvider>
         </ThemeContext.Provider>
