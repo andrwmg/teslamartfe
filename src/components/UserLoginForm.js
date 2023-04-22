@@ -13,7 +13,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 export default function LoginForm() {
     const { login, setLoading, verify } = useContext(ListingContext)
 
-    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
@@ -28,8 +28,8 @@ export default function LoginForm() {
 
     const navigate = useNavigate()
 
-    const handleUsernameChange = (event) => {
-        setUsername(event.target.value)
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value)
     }
 
     const handlePasswordChange = (event) => {
@@ -46,7 +46,7 @@ export default function LoginForm() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        let obj = { username, password }
+        let obj = { email, password }
         login(obj)
     }
 
@@ -66,12 +66,12 @@ export default function LoginForm() {
                         </Typography>
                         <TextField
                              
-                            id="outlined-username-input"
-                            label="Username"
+                            id="outlined-email-input"
+                            label="Email"
                             type="text"
-                            value={username}
-                            onChange={handleUsernameChange}
-                            autoComplete="current-username"
+                            value={email}
+                            onChange={handleEmailChange}
+                            autoComplete="current-email"
                             size="small"
                             fullWidth
                             required

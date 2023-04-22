@@ -39,13 +39,13 @@ export default function Message({ message, conversationListItem, changeRecipient
 
     const getAvatar = () => {
         if (contact) {
-            if (contact.image.url !== '' && contact.image.url !== "/broken-image.jpg") {
+            if (contact.image) {
                 return <Avatar alt={contact.username} src={contact.image.url} />
             } else {
                 return <DefaultAvatar username={contact.username} />
             }
         } else {
-            if (message.from.image && message.from.image.url !== '' && message.from.image.url !== "/broken-image.jpg") {
+            if (message.from.image) {
                 return <Avatar alt={message.from.username} src={message.from.image.url} />
             } else {
                 return <DefaultAvatar username={message.from.username} />
@@ -56,7 +56,7 @@ export default function Message({ message, conversationListItem, changeRecipient
         return (
             <>
                 {message &&
-                    <Grid maxWidth={{xs: '80%', md: '50%'}} marginLeft={(auth().id === message.from._id) && 'auto'} marginRight={(auth().id !== message.from._id) && 'auto'}marginTop={index === 0 && 'auto'}>
+                    <Grid maxWidth={{xs: '80%', md: '50%'}} marginLeft={(auth().id === message.from._id) && 'auto'} marginRight={(auth().id !== message.from._id) && 'auto'} marginTop={index === 0 && 'auto'}>
                         <Card elevation={2} sx={{ width: '100%' }} onClick={conversationListItem ? handleClick : null}>
                             <Grid container item direction='row' columnGap={2} display='flex' xs={12} padding={2} bgcolor={(auth().id === message.from._id) && lightBlue[50]} wrap='nowrap' >
                                 <Grid container item xs='auto' direction='column' justifyContent='flex-end'>
@@ -73,7 +73,7 @@ export default function Message({ message, conversationListItem, changeRecipient
 
                                         <Grid container item direction='column' xs={12}>
 
-                                            <Typography variant='body2' component='div' color={auth().id === message.from._id ? "black" : 'text.primary'}>
+                                            <Typography variant='body1' color={auth().id === message.from._id ? "black" : 'text.primary'}>
                                                 {body !== '' ? body : message.body}
                                             </Typography>
                                         </Grid>

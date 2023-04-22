@@ -20,6 +20,7 @@ export default function MessagesDrawer({ list, mobileOpen, handleDrawerToggle })
                     <SwipeableDrawer
                         container={container}
                         variant="temporary"
+                        swipeAreaWidth='40px'
                         open={mobileOpen}
                         onOpen={handleDrawerToggle}
                         onClose={handleDrawerToggle}

@@ -38,12 +38,10 @@ export default function Comment({ body, author, _id, deleteComment }) {
     // }
 
     return (
-        // <Grid container item direction='row' columnGap={2} display='flex' xs={12} height='572px'>
             <Paper sx={{ width: '100%', mb: 'auto', display: 'flex' }}>
                 <Grid container item direction='row' columnGap={2} display='flex' xs={12} padding={2} minHeight='74px'>
                     <Grid container item xs='auto' direction='column' justifyContent='flex-start'>
-                        {(author.image.url !== '' && author.image.url !==
-                            "/broken-image.jpg") ?
+                        {author.image ?
                             <Avatar alt={author.username} src={author.image.url} />
                             :
                             <DefaultAvatar username={author.username} />

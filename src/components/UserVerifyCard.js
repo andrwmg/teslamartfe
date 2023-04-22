@@ -10,7 +10,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 export default React.memo(function VerifyCard() {
     const { setLoading, resend } = useContext(ListingContext)
 
-    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
@@ -19,8 +19,8 @@ export default React.memo(function VerifyCard() {
         setLoading(false)
     }, [])
 
-    const handleUsernameChange = (event) => {
-        setUsername(event.target.value)
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value)
     }
 
     const handlePasswordChange = (event) => {
@@ -37,7 +37,7 @@ export default React.memo(function VerifyCard() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        let obj = { username, password }
+        let obj = { email, password }
         resend(obj)
     }
 
@@ -59,12 +59,12 @@ export default React.memo(function VerifyCard() {
                         </Typography>
                         <TextField
                              
-                            id="outlined-username-input"
-                            label="Username"
+                            id="outlined-email-input"
+                            label="Email"
                             type="text"
-                            value={username}
-                            onChange={handleUsernameChange}
-                            autoComplete="current-username"
+                            value={email}
+                            onChange={handleEmailChange}
+                            autoComplete="current-email"
                             size="small"
                             fullWidth
                             required

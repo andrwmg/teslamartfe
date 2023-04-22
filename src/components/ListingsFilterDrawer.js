@@ -47,6 +47,7 @@ export default React.memo(function FilterDrawer({ open, handleFilter, setOpen })
     return (
         <SwipeableDrawer
             variant="temporary"
+            swipeAreaWidth='40px'
             open={open}
             onClose={() => setOpen(!open)}
             onOpen={() => setOpen(!open)}

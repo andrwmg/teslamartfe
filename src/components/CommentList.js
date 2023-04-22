@@ -31,7 +31,7 @@ export default function CommentList({ id }) {
                 {isAuthenticated() ?
                     <CommentForm createComment={createComment} /> :
                     <Link to='/login' style={{ textDecoration: 'none' }}>
-                        <Typography variant='body1'>
+                        <Typography variant='body1' color='text.primary'>
                             Log in to leave a comment!
                         </Typography>
                     </Link>

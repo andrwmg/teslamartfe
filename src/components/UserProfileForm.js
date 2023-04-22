@@ -56,8 +56,8 @@ export default function UserProfileForm() {
 
   const selectFile = (event) => {
     const file = event.target.files
-    const image = [{ data: file[0], url: URL.createObjectURL(file[0]) }]
-    setTempImage(image[0])
+    const image = { data: file[0], url: URL.createObjectURL(file[0]) }
+    setTempImage(image)
   }
 
   return (

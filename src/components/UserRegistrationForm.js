@@ -18,7 +18,7 @@ export default function RegistrationForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [userImage, setUserImage] = useState([{ tempUrl: "/broken-image.jpg" }])
+  const [tempImage, setTempImage] = useState(null)
 
   let navigate = useNavigate()
 
@@ -44,15 +44,15 @@ export default function RegistrationForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const image = userImage[0].data ? await UploadFilesService.upload(userImage) : { filename: 'defaultUserImage', url: userImage[0].tempUrl }
-    let obj = { email: email, username: username, password: password, image: image }
+    const image = tempImage ? await UploadFilesService.upload([tempImage]) : null
+    let obj = { email, username, password, image: image ? image[0] : null }
     register(obj)
   }
 
   const selectFile = (event) => {
     const file = event.target.files
-    const image = [{ data: file[0], tempUrl: URL.createObjectURL(file[0]) }]
-    setUserImage(image)
+    const image = { data: file[0], url: URL.createObjectURL(file[0]) }
+    setTempImage(image)
   }
 
   return (
@@ -90,7 +90,7 @@ export default function RegistrationForm() {
                         variant="outlined"
                         component="div"
                         sx={{ borderRadius: '50%', p: 0 }}>
-                        <Avatar alt='' src={userImage[0].tempUrl} style={{ height: '100px', width: '100px', objectFit: 'cover', p: 'none', borderRadius: '50%' }} />
+                        <Avatar alt='' src={tempImage ? tempImage.url : "/broken-image.jpg"} style={{ height: '100px', width: '100px', objectFit: 'cover', p: 'none', borderRadius: '50%' }} />
                       </Button>
                     </div>
 
