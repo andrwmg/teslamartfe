@@ -11,12 +11,14 @@ export default function Comment({ body, author, _id, deleteComment }) {
 
     const isAuthenticated = useIsAuthenticated()
     const [isCommentAuthor, setIsCommentAuthor] = useState(false)
+    const [image, setImage] = useState(null)
     // const [replies, setReplies] = useState([])
     // const [confirmDelete, setConfirmDelete] = useState(false)
     // const [showReply, setShowReply] = useState(false)
 
     useEffect(() => {
         isAuthenticated() && setIsCommentAuthor(auth().id === author._id)
+        author.image && setImage(author.image.url)
         // CommentDataService.get({commentId: _id, id: id})
         // .then(({data}) => {
         //     console.log(data)
@@ -41,8 +43,8 @@ export default function Comment({ body, author, _id, deleteComment }) {
             <Paper sx={{ width: '100%', mb: 'auto', display: 'flex' }}>
                 <Grid container item direction='row' columnGap={2} display='flex' xs={12} padding={2} minHeight='74px'>
                     <Grid container item xs='auto' direction='column' justifyContent='flex-start'>
-                        {author.image ?
-                            <Avatar alt={author.username} src={author.image.url} />
+                        {image ?
+                            <Avatar alt={author.username} src={image} />
                             :
                             <DefaultAvatar username={author.username} />
                         }
