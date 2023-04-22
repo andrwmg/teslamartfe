@@ -11,7 +11,7 @@ export const CustomThemeProvider = ({ children }) => {
 
     useEffect(() => {
         if (getHours(new Date()) > 6 && getHours(new Date()) < 19) {
-            setTheme('dark')
+            setTheme('light')
         } else {
             setTheme('dark')
         }

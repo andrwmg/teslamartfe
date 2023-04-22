@@ -120,7 +120,7 @@ export default React.memo(function Messages({ window }) {
                 <Grid container direction='row' justifyContent='center' alignItems='center' width='100%' height='calc(100vh - 128px)' columnGap={4}>
                     {loaded && allMessages.length === 0 ?
                         <Grid container item justifyContent='center' alignItems='center'>
-                            <Typography>
+                            <Typography variant='h4' color='text.primary'>
                                 No messages
                             </Typography>
                         </Grid>

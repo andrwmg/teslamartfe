@@ -73,7 +73,7 @@ export default function Message({ message, conversationListItem, changeRecipient
 
                                         <Grid container item direction='column' xs={12}>
 
-                                            <Typography variant='body2' component='div' color="text.primary">
+                                            <Typography variant='body2' component='div' color={auth().id === message.from._id ? "black" : 'text.primary'}>
                                                 {body !== '' ? body : message.body}
                                             </Typography>
                                         </Grid>

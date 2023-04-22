@@ -101,7 +101,7 @@ function Listings() {
 
         {currentListings.length < 1 ?
           <Grid container item justifyContent='center' sx={{ opacity: loading ? 0 : 1 }}>
-            <Typography fontWeight={700}>
+            <Typography fontWeight={700} color='text.primary'>
               Filters did not return any results.
             </Typography>
           </Grid>
