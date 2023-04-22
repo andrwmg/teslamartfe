@@ -124,7 +124,7 @@ export default function ResetForm() {
                                             onMouseDown={handleClickShowConfirm}
                                             edge="end"
                                         >
-                                            {showConfirm ? <VisibilityOff /> : <Visibility />}
+                                            {showConfirm ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
                             }}
