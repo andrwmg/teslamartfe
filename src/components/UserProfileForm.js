@@ -78,7 +78,7 @@ export default function UserProfileForm() {
                     name="images"
                     style={{ display: 'none' }}
                     type="file"
-                    accept="image/*"
+                    accept=".jpg,.jpeg,.png,.bmp"
                     onChange={selectFile}
                   />
                 </div>

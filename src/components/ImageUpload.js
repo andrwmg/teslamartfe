@@ -55,7 +55,7 @@ export default function ImageUpload({ setImages }) {
             name="images"
             style={{ display: 'none' }}
             type="file"
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.bmp"
             onChange={selectFiles}
             multiple
             disabled={disabled}
