@@ -19,12 +19,12 @@ export default function FilterBar({ chips, handleDelete, handleOpen }) {
             <AppBar position="static" sx={{ bgcolor: theme === 'dark' ?  'rgba(0,0,0,.85)' : 'rgba(255,255,255,.85)', height: '100%', boxShadow: 'none', justifyContent: 'center', transition: '.3s ease-in-out' }}>
                 <Container fixed sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', gap: 2 }}>
                     <Box sx={{ flexGrow: 1 }} />
-                        <Grid container item overflow='scroll' wrap='nowrap' gap={2} px={1}>
+                        <Grid container item overflow='scroll' wrap='nowrap' gap={1} px={1} width='fit-content'>
                     {chips && chips.map(chip => (
                         <ListingsFilterChip key={chip.key} filterKey={chip.key} filterValue={chip.value} handleDelete={handleDelete} />
                     ))}
                     </Grid>
-                    {(auth() && auth().username === 'nellie') && <Button onClick={createSeedListing}>Seed Listing</Button>}
+                    {(auth() && auth().username === 'nellie') && <Button onClick={createSeedListing} sx={{minWidth: '100px'}}>Seed Listing</Button>}
                     <IconButton
                         onClick={handleOpen}
                         size="large"
